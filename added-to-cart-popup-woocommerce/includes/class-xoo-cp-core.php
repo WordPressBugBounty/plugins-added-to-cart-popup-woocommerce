@@ -1,14 +1,14 @@
 <?php
 
-if(!defined('ABSPATH')){
-	return;
-}
+defined( 'ABSPATH' ) || exit;
 
 class Xoo_CP_Core{
 
 	protected static $instance = null;
 
 	public $action = null;
+
+	public $glSettings = array();
 
 	//Get instance
 	public static function get_instance(){
@@ -20,25 +20,20 @@ class Xoo_CP_Core{
 
 
 	public function __construct(){
+		$this->glSettings = xoo_cp_helper()->get_general_option();
+		$this->hooks();
+	}
+
+	public function hooks(){
 		add_action('wc_ajax_xoo_cp_add_to_cart',array($this,'xoo_cp_add_to_cart'));
 		add_action('wc_ajax_xoo_cp_update_cart',array($this,'xoo_cp_update_cart'));
 		add_filter('woocommerce_add_to_cart_fragments',array($this,'set_ajax_fragments'),10,1);
 		add_action('woocommerce_add_to_cart',array($this,'set_last_added_cart_item_key'),10,6);
-		add_action( 'plugins_loaded', array( $this, 'on_install' ), 20 );
-	}
-
-	public function on_install(){
-		//First time installed
-		if( get_option('xoo-cp-gl-atcem') === false ){
-			update_option('woocommerce_enable_ajax_add_to_cart', 'yes');
-		}
 	}
 
 
 	//Get cart Content
 	public function get_cart_content(){
-		global $xoo_cp_gl_pden_value;
-
 		//Get last cart item key
 		$cart_item_key = get_option('xoo_cp_added_cart_key');
 
@@ -50,7 +45,7 @@ class Xoo_CP_Core{
 
 		$notice = $this->get_notice_html();
 
-		if($this->action == 'remove' || !$xoo_cp_gl_pden_value){
+		if( $this->action == 'remove' || $this->glSettings['m-pden'] !== 'yes' ){
 			return $notice;
 		}
 
@@ -89,7 +84,6 @@ class Xoo_CP_Core{
 
 	//add to cart ajax on single product page
 	public function xoo_cp_add_to_cart(){
-		global $woocommerce,$xoo_cp_gl_qtyen_value,$xoo_cp_gl_ibtne_value;
 
 		if(!isset($_POST['action']) || $_POST['action'] != 'xoo_cp_add_to_cart' || !isset($_POST['add-to-cart'])){
 			die();
@@ -152,7 +146,7 @@ class Xoo_CP_Core{
 		$new_qty = (float) $_POST['new_qty'];
 
 		if(!is_numeric($new_qty) || $new_qty < 0 || !$cart_key){
-			wp_send_json(array('error' => __('Something went wrong','side-cart-woocommerce')));
+			wp_send_json(array('error' => __('Something went wrong','added-to-cart-popup-woocommerce')));
 		}
 		
 
@@ -165,7 +159,8 @@ class Xoo_CP_Core{
 		}
 		else{
 			if(wc_notice_count('error') > 0){
-	    		echo wc_print_notices();
+	    		echo wc_print_notices(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	    		// Already escaped and sanitized by WooCommerce core
 			}
 		}
 		die();

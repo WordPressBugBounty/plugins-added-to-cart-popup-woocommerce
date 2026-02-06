@@ -1,17 +1,18 @@
 <?php
 
-//Exit if accessed directly
-if(!defined('ABSPATH')){
-	return; 	
-}
+defined( 'ABSPATH' ) || exit;
 
 class Xoo_CP_Public{
 
 	protected static $instance = null;
 
+
 	public function __construct(){
+		$this->hooks();
+	}
+
+	public function hooks(){
 		add_action('wp_enqueue_scripts',array($this,'enqueue_scripts'));
-		add_action('plugins_loaded',array($this,'load_txt_domain'),99);
 		add_action('wp_footer',array($this,'get_popup_markup'));
 		add_filter( 'pre_option_woocommerce_cart_redirect_after_add', array($this,'prevent_cart_redirect'),10,1);
 	}
@@ -25,66 +26,80 @@ class Xoo_CP_Public{
 	}
 
 	//Inline styles from cart popup settings
-	public static function get_inline_styles(){
-		global $xoo_cp_sy_pw_value,$xoo_cp_sy_imgw_value,$xoo_cp_sy_btnbg_value,$xoo_cp_sy_btnc_value,$xoo_cp_sy_btns_value,$xoo_cp_sy_btnbr_value,$xoo_cp_sy_tbc_value,$xoo_cp_sy_tbs_value,$xoo_cp_gl_ibtne_value,$xoo_cp_gl_vcbtne_value,$xoo_cp_gl_chbtne_value,$xoo_cp_gl_qtyen_value,$xoo_cp_gl_spinen_value;
+	public function get_inline_styles(){
+
+		$sySettings = xoo_cp_helper()->get_style_option();
+		$glSettings = xoo_cp_helper()->get_general_option();
+
+
+		$imageWidth 	= $sySettings['tb-img-width'];
+
+		$btnBGColor 	= $sySettings['pop-btn-bgcolor'];
+		$btnTxtColor 	= $sySettings['pop-btn-txtcolor'];
+		$btnFsize 		= $sySettings['pop-btn-fsize'];
+		$btnBorRadius 	= $sySettings['pop-btn-bradius'];
+
+		$tabBorSize		= $sySettings['tb-bdsize'];
+		$tabBorColor	= $sySettings['tb-bdcolor'];
+
+		$popupWidth 	= $sySettings['pop-width'];
+
 
 		$style = '';
 
-		if(!$xoo_cp_gl_vcbtne_value){
+		if( $glSettings['m-vcbtne'] !== 'yes' ){
 			$style .= 'a.xoo-cp-btn-vc{
 				display: none;
 			}';
 		}
 
-		if(!$xoo_cp_gl_ibtne_value){
+		if( $glSettings['m-ibtne'] !== 'yes' ){
 			$style .= 'span.xcp-chng{
 				display: none;
 			}';
 		}
 
-		if(!$xoo_cp_gl_chbtne_value){
+		if( $glSettings['m-chbtne'] !== 'yes' ){
 			$style .= 'a.xoo-cp-btn-ch{
 				display: none;
 			}';
 		}
 
-		if($xoo_cp_gl_qtyen_value && $xoo_cp_gl_ibtne_value){
+		if( $glSettings['m-ibtne'] === 'yes' && $glSettings['m-qtyen'] === 'yes' ){
 			$style .= 'td.xoo-cp-pqty{
 			    min-width: 120px;
 			}';
 		}
-		else{
-			
-		}
+		
 
-		if(!$xoo_cp_gl_spinen_value){
+		if( $glSettings['m-spinen'] !== 'yes'  ){
 			$style .= '.xoo-cp-adding,.xoo-cp-added{display:none!important}';
 		}
 
 		$style.= "
 			.xoo-cp-container{
-				max-width: {$xoo_cp_sy_pw_value}px;
+				max-width: {$popupWidth}px;
 			}
 			.xcp-btn{
-				background-color: {$xoo_cp_sy_btnbg_value};
-				color: {$xoo_cp_sy_btnc_value};
-				font-size: {$xoo_cp_sy_btns_value}px;
-				border-radius: {$xoo_cp_sy_btnbr_value}px;
-				border: 1px solid {$xoo_cp_sy_btnbg_value};
+				background-color: {$btnBGColor};
+				color: {$btnTxtColor};
+				font-size: {$btnFsize}px;
+				border-radius: {$btnBorRadius}px;
+				border: 1px solid {$btnBGColor};
 			}
 			.xcp-btn:hover{
-				color: {$xoo_cp_sy_btnc_value};
+				color: {$btnTxtColor};
 			}
 			td.xoo-cp-pimg{
-				width: {$xoo_cp_sy_imgw_value}%;
+				width: {$imageWidth}%;
 			}
 			table.xoo-cp-pdetails , table.xoo-cp-pdetails tr{
 				border: 0!important;
 			}
 			table.xoo-cp-pdetails td{
 				border-style: solid;
-				border-width: {$xoo_cp_sy_tbs_value}px;
-				border-color: {$xoo_cp_sy_tbc_value};
+				border-width: {$tabBorSize}px;
+				border-color: {$tabBorColor};
 			}";
 
 			return $style;
@@ -93,8 +108,6 @@ class Xoo_CP_Public{
 
 	//enqueue stylesheets & scripts
 	public function enqueue_scripts(){
-		global $xoo_cp_gl_resetbtn_value;
-
 
 		wp_enqueue_script('wc-cart-fragments');
 
@@ -105,19 +118,11 @@ class Xoo_CP_Public{
 			'adminurl'     		=> admin_url().'admin-ajax.php',
 			'homeurl' 			=> get_bloginfo('url'),
 			'wc_ajax_url' 		=> WC_AJAX::get_endpoint( "%%endpoint%%" ),
-			'reset_cart'		=> $xoo_cp_gl_resetbtn_value
+			'reset_cart'		=> xoo_cp_helper()->get_general_option('m-resetbtn') === "yes"
 		));
 
-		wp_add_inline_style('xoo-cp-style',self::get_inline_styles());
+		wp_add_inline_style('xoo-cp-style',$this->get_inline_styles());
 
-	}
-
-	//Load text domain
-	public function load_txt_domain(){
-		$domain = 'added-to-cart-popup-woocommerce';
-		$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
-		load_textdomain( $domain, WP_LANG_DIR . '/'.$domain.'-' . $locale . '.mo' ); //wp-content languages
-		load_plugin_textdomain( $domain, FALSE, basename(XOO_CP_PATH) . '/languages/' ); // Plugin Languages
 	}
 
 

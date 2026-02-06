@@ -309,11 +309,11 @@ input[type=number].xoo-cp-qty{
     border: 0!important;
     text-align: center;
     display: inline-block;
-    max-width: 30px;
-    float: left;
     height: 100%;
     line-height: 100%;
     padding: 0;
+    max-width: 50px;
+    margin: 0;
 }
 input.xoo-cp-qty::-webkit-outer-spin-button,
 input.xoo-cp-qty::-webkit-inner-spin-button {
@@ -329,6 +329,9 @@ input.xoo-cp-qty::-webkit-inner-spin-button {
     font-weight: 700;
     height: 37px;
     line-height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .xoo-cp-added,.xoo-cp-adding{
     margin-left: 5px;

@@ -1,3 +1,61 @@
+@font-face {
+  font-family: 'woo-cart-popup-premium';
+  src:  url('../../../assets/css/fonts/woo-cart-popup-premium.eot?vj5qsb');
+  src:  url('../../../assets/css/fonts/woo-cart-popup-premium.eot?vj5qsb#iefix') format('embedded-opentype'),
+    url('../../../assets/css/fonts/woo-cart-popup-premium.ttf?vj5qsb') format('truetype'),
+    url('../../../assets/css/fonts/woo-cart-popup-premium.woff?vj5qsb') format('woff'),
+    url('../../../assets/css/fonts/woo-cart-popup-premium.svg?vj5qsb#woo-cart-popup-premium') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="xoo-cp-icon-"], [class*=" xoo-cp-icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'woo-cart-popup-premium' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.xoo-cp-icon-close:before {
+  content: "\e906";
+}
+.xoo-cp-icon-basket5:before {
+  content: "\e900";
+}
+.xoo-cp-icon-basket4:before {
+  content: "\e901";
+}
+.xoo-cp-icon-basket6:before {
+  content: "\e902";
+}
+.xoo-cp-icon-basket1:before {
+  content: "\e903";
+}
+.xoo-cp-icon-basket2:before {
+  content: "\e904";
+}
+.xoo-cp-icon-basket3:before {
+  content: "\e905";
+}
+.xoo-cp-icon-spinner:before {
+  content: "\e97b";
+}
+.xoo-cp-icon-cross:before {
+  content: "\ea0d";
+}
+.xoo-cp-icon-check:before {
+  content: "\ea10";
+}
+
+
 .xoo-cp-form h2{
     background-color: #5e6871;
     padding: 11px;
