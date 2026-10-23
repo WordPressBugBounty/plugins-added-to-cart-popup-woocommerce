@@ -3,7 +3,7 @@ Contributors: XootiX
 Donate link: https://www.paypal.me/xootix
 Tags: woocommerce cart, ajax add to cart, cart popup, cart, popup
 Requires at least: 4.0
-Tested up to: 6.9
+Tested up to: 7.0
 Stable tag: 1.8.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
